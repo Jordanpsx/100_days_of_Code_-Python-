@@ -3,6 +3,7 @@ MENU = {
     "espresso": {
         "ingredients": {
             "water": 50,
+            "milk": 0,
             "coffee": 18,
         },
         "cost": 1.5,
@@ -29,6 +30,7 @@ resources = {
     "water": 300,
     "milk": 200,
     "coffee": 100,
+    "cash": 0
 }
 
 COINS ={
@@ -37,9 +39,6 @@ COINS ={
     "nickel": 0.5,
     "pennies": 0.1,
 }
-
-
-
 
 def coffee_machine():
     #Here we play the logic of coffee machine
@@ -52,16 +51,23 @@ def coffee_machine():
             return True
 
     def payment(choice2):
-        payed = 0
+        payed = 0.0
         coin =""
+        coins = []
         while choice2 > payed:
-            while not coin.isdigit():
-                coin = input("put a coin")
-                payed += int(coin)
-                print(f"you already payed {payed}. coffee costed {choice2} you still need pay {choice - payed}")
+            coin = input("put a coin. type 'quarter', 'dime', 'nickel', 'pennies')")
+            while coin not in COINS.keys():
+                coin = input("put a coin. type 'quarter', 'dime', 'nickel', 'pennies')")
 
-            if choice2 != payed:
-                you
+            coins.append(coin)  #save the coins used in system
+            payed += COINS[coin]
+            print(f"you already payed ${payed}. coffee costed ${choice2} you still need pay ${choice2 - payed}")
+
+        if choice2 != payed:
+            print(f"We refund you {payed - choice2}")
+            payed =payed - (payed - choice2)
+
+        resources["cash"] += payed
 
     print("hello☕, which type of coffee you want to buy? (type the correspondent number")
     count = 0
@@ -78,11 +84,13 @@ def coffee_machine():
         choice = input()
 
     if choice == "off":
-        return "Machine turn off for maintenance"
+        print("Machine turn off for maintenance")
+        return True
 
-    if choice in coffee.keys():
+    elif choice in coffee.keys():
         if not see_enough_resources(MENU[coffee[choice]], resources):
-            return "We don't have enough resources to make this coffee"
+            print("We don't have enough resources to make this coffee")
+            return False
 
         else:
             payment(MENU[coffee[choice]]["cost"])
@@ -91,9 +99,15 @@ def coffee_machine():
             resources ["milk"] = resources ["milk"] - MENU[coffee[choice]]["ingredients"]["milk"]
             resources ["coffee"] = resources ["coffee"] - MENU[coffee[choice]]["ingredients"]["coffee"]
 
+            print(f"here is you {coffee[choice]} Enjoy you drink!")
+            return False
 
+    elif choice == "report":
+        print (resources)
+        return False
 
-print(coffee_machine())
+end = False
+while not end:
 
+    end = coffee_machine()
 
-#TODO: ainda preciso colocar a lógica de troco do cliente, o que fazer quando não tiver dinheiro o suficiente?
